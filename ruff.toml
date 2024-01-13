@@ -1,0 +1,24 @@
+[lint]
+extend-select = [
+    "I",      # Missing required import (auto-fixable)
+    "UP",     # Pyupgrade
+    "RUF100", # Unused noqa (auto-fixable)
+    "D101",
+    "D106",
+    "D2",
+    "D3",
+    "D400",
+    "D402",
+    "D403",
+    "D412",
+    "D419",
+    "TCH",    # Rules around TYPE_CHECKING blocks
+    "TID251", # Specific modules or module members that may not be imported or accessed
+    "TID253", # Ban certain modules from being imported at module level
+    "ISC",    # Checks for implicit literal string concatenation (auto-fixable)
+    "B006",   # Checks for uses of mutable objects as function argument defaults.
+]
+ignore = ["D203", "D213"]
+
+[format]
+docstring-code-format = true
