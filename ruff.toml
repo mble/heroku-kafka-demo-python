@@ -18,7 +18,7 @@ extend-select = [
     "ISC",    # Checks for implicit literal string concatenation (auto-fixable)
     "B006",   # Checks for uses of mutable objects as function argument defaults.
 ]
-ignore = ["D203", "D213"]
+ignore = ["D203", "D213", "ISC001"]
 
 [format]
 docstring-code-format = true

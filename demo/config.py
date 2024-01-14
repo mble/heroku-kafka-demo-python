@@ -1,10 +1,12 @@
 """Configuration for the demo application."""
+from __future__ import annotations
 
 import os
 import ssl
 from base64 import standard_b64encode
 from dataclasses import dataclass
 from tempfile import NamedTemporaryFile
+from typing import Self
 from urllib.parse import urlparse
 
 from cryptography.hazmat.backends import default_backend
@@ -14,7 +16,7 @@ from cryptography.hazmat.primitives import serialization
 @dataclass
 class KafkaConfig:
     """Kafka configuration."""
-    
+
     bootstrap_servers: str
     topic: str
     group_id: str
@@ -23,7 +25,8 @@ class KafkaConfig:
     client_cert_key: str
     trusted_cert: str
 
-    def __post_init__(self):
+    def __post_init__(self: Self) -> None:
+        """Post-initialization hook."""
         if self.prefix:
             self.topic = f"{self.prefix}{self.topic}"
             self.group_id = f"{self.prefix}{self.group_id}"
@@ -36,6 +39,14 @@ class WebConfig:
     port: str
 
 
+class ConfigRequiredError(Exception):
+    """Exception raised when a required configuration value is missing."""
+
+    def __init__(self: Self, envvar: str) -> None:
+        """Initialize exception."""
+        super().__init__(f"{envvar} is required")
+
+
 @dataclass
 class Config:
     """Application configuration."""
@@ -43,7 +54,8 @@ class Config:
     kafka: KafkaConfig
     web: WebConfig
 
-    def __init__(self):
+    def __init__(self: Self) -> None:
+        """Initialize configuration."""
         self.kafka = KafkaConfig(
             bootstrap_servers=os.getenv("KAFKA_URL"),
             topic=os.getenv("KAFKA_TOPIC", "messages"),
@@ -55,17 +67,23 @@ class Config:
         )
         self.web = WebConfig(port=os.getenv("PORT", "8000"))
 
-    def validate(self) -> None:
+    def validate(self: Self) -> None:
+        """Validate configuration."""
         if not self.kafka.bootstrap_servers:
-            raise ValueError("KAFKA_URL is required")
+            key = "KAFKA_URL"
+            raise ConfigRequiredError(key)
         if not self.kafka.client_cert:
-            raise ValueError("KAFKA_CLIENT_CERT is required")
+            key = "KAFKA_CLIENT_CERT"
+            raise ConfigRequiredError(key)
         if not self.kafka.client_cert_key:
-            raise ValueError("KAFKA_CLIENT_CERT_KEY is required")
+            key = "KAFKA_CLIENT_CERT_KEY"
+            raise ConfigRequiredError(key)
         if not self.kafka.trusted_cert:
-            raise ValueError("KAFKA_TRUSTED_CERT is required")
+            key = "KAFKA_TRUSTED_CERT"
+            raise ConfigRequiredError(key)
 
-    def broker_list(self) -> list[str]:
+    def broker_list(self: Self) -> list[str]:
+        """Return Kafka broker list, parsed from KAFKA_URL."""
         urls = self.kafka.bootstrap_servers.split(",")
         addrs = []
 
@@ -75,7 +93,8 @@ class Config:
 
         return addrs
 
-    def create_ssl_context(self) -> ssl.SSLContext:
+    def create_ssl_context(self: Self) -> ssl.SSLContext:
+        """Create SSL context."""
         with NamedTemporaryFile(suffix=".crt") as cert_file, NamedTemporaryFile(
             suffix=".key",
         ) as key_file, NamedTemporaryFile(suffix=".crt") as trust_file:
@@ -102,10 +121,13 @@ class Config:
             trust_file.flush()
 
             ssl_context = ssl.create_default_context(
-                ssl.Purpose.SERVER_AUTH, cafile=trust_file.name,
+                ssl.Purpose.SERVER_AUTH,
+                cafile=trust_file.name,
             )
             ssl_context.load_cert_chain(
-                cert_file.name, keyfile=key_file.name, password=passwd,
+                cert_file.name,
+                keyfile=key_file.name,
+                password=passwd,
             )
 
             ssl_context.check_hostname = False

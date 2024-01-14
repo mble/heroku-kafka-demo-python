@@ -10,7 +10,8 @@ cfg = Config()
 cfg.validate()
 
 
-async def consume_messages(cfg: Config, buffer: MessageBuffer):
+async def consume_messages(cfg: Config, buffer: MessageBuffer) -> None:
+    """Consume messages from Kafka."""
     ssl_context = cfg.create_ssl_context()
 
     consumer = AIOKafkaConsumer(
