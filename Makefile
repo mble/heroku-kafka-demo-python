@@ -1,5 +1,5 @@
 lint:
-	@ruff check .
+	@ruff check . --fix
 .PHONY: lint
 
 format: lint
@@ -7,5 +7,5 @@ format: lint
 .PHONY: format
 
 run:
-	@python demo/app.py
+	@python -m demo.app
 .PHONY: run

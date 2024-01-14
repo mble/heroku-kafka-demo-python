@@ -5,11 +5,12 @@ import logging
 import signal
 from datetime import datetime, timezone
 
-from config import Config
-from consumer import consume_messages
-from kafka_message import MessageBuffer
-from producer import produce_message
 from quart import Quart, jsonify, render_template, request
+
+from .config import Config
+from .consumer import consume_messages
+from .kafka_message import MessageBuffer
+from .producer import produce_message
 
 cfg = Config()
 cfg.validate()

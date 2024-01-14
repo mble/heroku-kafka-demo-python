@@ -3,8 +3,9 @@
 import asyncio
 
 from aiokafka import AIOKafkaConsumer
-from config import Config
-from kafka_message import KafkaMessage, KafkaMessageMetadata, MessageBuffer
+
+from .config import Config
+from .kafka_message import KafkaMessage, KafkaMessageMetadata, MessageBuffer
 
 cfg = Config()
 cfg.validate()

@@ -3,7 +3,8 @@
 import asyncio
 
 from aiokafka import AIOKafkaProducer
-from config import Config
+
+from .config import Config
 
 cfg = Config()
 cfg.validate()
