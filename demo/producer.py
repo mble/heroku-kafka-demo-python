@@ -6,11 +6,8 @@ from aiokafka import AIOKafkaProducer
 
 from .config import Config
 
-cfg = Config()
-cfg.validate()
 
-
-async def produce_message(msg: str) -> None:
+async def produce_message(cfg: Config, msg: str) -> None:
     """Produce message to Kafka."""
     ssl_context = cfg.create_ssl_context()
 

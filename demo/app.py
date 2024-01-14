@@ -51,7 +51,7 @@ async def messages() -> str:
 async def post_message() -> str:
     """Post message handler, sends the message to the Kafka topic."""
     msg = await request.get_data(as_text=True)
-    await produce_message(msg)
+    await produce_message(cfg, msg)
     return jsonify({"status": "ok"})
 
 

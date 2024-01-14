@@ -9,3 +9,7 @@ format: lint
 run:
 	@python -m demo.app
 .PHONY: run
+
+test:
+	@python -m pytest -q
+.PHONY: test

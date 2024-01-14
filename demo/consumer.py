@@ -7,9 +7,6 @@ from aiokafka import AIOKafkaConsumer
 from .config import Config
 from .kafka_message import KafkaMessage, KafkaMessageMetadata, MessageBuffer
 
-cfg = Config()
-cfg.validate()
-
 
 async def consume_messages(cfg: Config, buffer: MessageBuffer) -> None:
     """Consume messages from Kafka."""

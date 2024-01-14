@@ -1,4 +1,7 @@
-[lint]
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib"]
+
+[tool.ruff.lint]
 extend-select = [
     "I",      # Missing required import (auto-fixable)
     "UP",     # Pyupgrade
@@ -20,5 +23,5 @@ extend-select = [
 ]
 ignore = ["D203", "D213", "ISC001"]
 
-[format]
+[tool.ruff.format]
 docstring-code-format = true
