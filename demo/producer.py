@@ -1,6 +1,5 @@
 """Producer example."""
 
-import asyncio
 
 from aiokafka import AIOKafkaProducer
 
@@ -25,7 +24,5 @@ async def produce_message(cfg: Config, msg: str) -> None:
             cfg.kafka.topic,
             msg.encode("utf-8"),
         )
-    except asyncio.CancelledError:
-        await producer.stop()
     finally:
         await producer.stop()

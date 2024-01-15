@@ -77,7 +77,9 @@ def main() -> None:
     import hypercorn.asyncio
     from hypercorn.config import Config as HypercornConfig
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
     signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
     for s in signals:
         loop.add_signal_handler(

@@ -1,6 +1,5 @@
 """Consumer example."""
 
-import asyncio
 
 from aiokafka import AIOKafkaConsumer
 
@@ -31,7 +30,5 @@ async def consume_messages(cfg: Config, buffer: MessageBuffer) -> None:
                 metadata=KafkaMessageMetadata(receivedAt=msg.timestamp),
             )
             buffer.append(kmsg)
-    except asyncio.CancelledError:
-        await consumer.stop()
     finally:
         await consumer.stop()
