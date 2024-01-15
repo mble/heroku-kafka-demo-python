@@ -85,12 +85,16 @@ def main() -> None:
             lambda s=s: asyncio.create_task(shutdown(s, loop, logger)),
         )
 
-    # hypercorn_cfg = HypercornConfig()
-    # hypercorn_cfg.bind = [f"localhost:{cfg.web.port}"]
+    hypercorn_cfg = HypercornConfig()
+    hypercorn_cfg.bind = f"0.0.0.0:{cfg.web.port}"
 
     try:
         loop.create_task(consume_messages(cfg, buffer))
-        loop.create_task(app.run_task(host="0.0.0.0", port=cfg.web.port, shutdown_trigger=shutdown_event.wait))
+        loop.create_task(
+            hypercorn.asyncio.serve(
+                app, hypercorn_cfg, shutdown_trigger=shutdown_event.wait
+            )
+        )
         loop.run_forever()
     finally:
         loop.close()
