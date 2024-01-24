@@ -23,15 +23,36 @@ class TestMessageBuffer:
     """Test MessageBuffer."""
 
     def test_append(self):
+        msgs: list[KafkaMessage] = []
+        for i in range(3):
+            msgs.append(
+                KafkaMessage(
+                    value=str(i),
+                    partition=0,
+                    offset=0,
+                    metadata=KafkaMessageMetadata(receivedAt=0),
+                )
+            )
+
         buffer = MessageBuffer(2)
-        buffer.append(1)
-        buffer.append(2)
-        buffer.append(3)
-        assert list(buffer) == [2, 3]
+        for msg in msgs:
+            buffer.append(msg)
+        assert list(buffer) == [msgs[1], msgs[2]]
 
     def test_iter(self):
+        msgs: list[KafkaMessage] = []
+        for i in range(2):
+            msgs.append(
+                KafkaMessage(
+                    value=str(i),
+                    partition=0,
+                    offset=0,
+                    metadata=KafkaMessageMetadata(receivedAt=0),
+                )
+            )
+
         buffer = MessageBuffer(2)
-        buffer.append(1)
-        buffer.append(2)
-        for i, j in zip(buffer, [1, 2]):
+        for msg in msgs:
+            buffer.append(msg)
+        for i, j in zip(buffer, [msgs[0], msgs[1]]):
             assert i == j

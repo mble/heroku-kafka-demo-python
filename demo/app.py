@@ -4,8 +4,9 @@ import asyncio
 import logging
 import signal
 from datetime import datetime, timezone
+from typing import Any
 
-from quart import Quart, jsonify, render_template, request
+from quart import Quart, Response, jsonify, render_template, request
 
 from .config import Config
 from .consumer import consume_messages
@@ -34,9 +35,9 @@ async def index() -> str:
 
 
 @app.route("/messages", methods=["GET"])
-async def messages() -> str:
+async def messages() -> Response:
     """Messages handler, returns the contents of the message buffer."""
-    messages = []
+    messages: list[dict[str, Any]] = []
     for msg in buffer:
         parsed = msg.to_dict()
         parsed["metadata"]["receivedAt"] = datetime.fromtimestamp(
@@ -48,15 +49,15 @@ async def messages() -> str:
 
 
 @app.route(f"/messages/{cfg.kafka.topic}", methods=["POST"])
-async def post_message() -> str:
+async def post_message() -> Response:
     """Post message handler, sends the message to the Kafka topic."""
-    msg = await request.get_data(as_text=True)
+    msg: str = await request.get_data(as_text=True)
     await produce_message(cfg, msg)
     return jsonify({"status": "ok"})
 
 
 async def shutdown(
-    signal: signal,
+    signal: signal.Signals,
     loop: asyncio.AbstractEventLoop,
     logger: logging.Logger,
 ) -> None:
@@ -84,7 +85,7 @@ def main() -> None:
     for s in signals:
         loop.add_signal_handler(
             s,
-            lambda s=s: asyncio.create_task(shutdown(s, loop, logger)),
+            lambda: asyncio.create_task(shutdown(s, loop, logger)),
         )
 
     hypercorn_cfg = HypercornConfig()
@@ -93,7 +94,7 @@ def main() -> None:
     try:
         loop.create_task(consume_messages(cfg, buffer))
         loop.create_task(
-            hypercorn.asyncio.serve(
+            hypercorn.asyncio.serve(  # type: ignore
                 app, hypercorn_cfg, shutdown_trigger=shutdown_event.wait
             )
         )

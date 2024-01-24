@@ -1,7 +1,7 @@
 """Producer example."""
 
 
-from aiokafka import AIOKafkaProducer
+from aiokafka import AIOKafkaProducer  # type: ignore
 
 from .config import Config
 
@@ -11,7 +11,7 @@ async def produce_message(cfg: Config, msg: str) -> None:
     ssl_context = cfg.create_ssl_context()
 
     producer = AIOKafkaProducer(
-        bootstrap_servers=cfg.broker_list(),
+        bootstrap_servers=cfg.broker_list(),  # type: ignore
         security_protocol="SSL",
         ssl_context=ssl_context,
         acks="all",
@@ -20,7 +20,7 @@ async def produce_message(cfg: Config, msg: str) -> None:
     await producer.start()
 
     try:
-        await producer.send_and_wait(
+        await producer.send_and_wait(  # type: ignore
             cfg.kafka.topic,
             msg.encode("utf-8"),
         )

@@ -1,7 +1,7 @@
 """Kafka message model."""
 
 from dataclasses import asdict, dataclass
-from typing import Self
+from typing import Any, Iterator, Self
 
 
 @dataclass
@@ -20,7 +20,7 @@ class KafkaMessage:
     offset: int
     metadata: KafkaMessageMetadata
 
-    def to_dict(self: Self) -> dict:
+    def to_dict(self: Self) -> dict[str, Any]:
         """Convert to dict."""
         return asdict(self)
 
@@ -31,9 +31,9 @@ class MessageBuffer:
     def __init__(self: Self, max_size: int) -> None:
         """Initialize buffer."""
         self.max_size = max_size
-        self.buffer = []
+        self.buffer: list[KafkaMessage] = []
 
-    def __iter__(self: Self) -> None:
+    def __iter__(self: Self) -> Iterator[KafkaMessage]:
         """Iterate over buffer."""
         return iter(self.buffer)
 

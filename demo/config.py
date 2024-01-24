@@ -17,13 +17,13 @@ from cryptography.hazmat.primitives import serialization
 class KafkaConfig:
     """Kafka configuration."""
 
-    bootstrap_servers: str
+    bootstrap_servers: str | None
     topic: str
     group_id: str
-    prefix: str
-    client_cert: str
-    client_cert_key: str
-    trusted_cert: str
+    prefix: str | None
+    client_cert: str | None
+    client_cert_key: str | None
+    trusted_cert: str | None
 
     def __post_init__(self: Self) -> None:
         """Post-initialization hook."""
@@ -84,8 +84,11 @@ class Config:
 
     def broker_list(self: Self) -> list[str]:
         """Return Kafka broker list, parsed from KAFKA_URL."""
+        if not self.kafka.bootstrap_servers:
+            raise ConfigRequiredError("KAFKA_URL")
+
         urls = self.kafka.bootstrap_servers.split(",")
-        addrs = []
+        addrs: list[str] = []
 
         for url in urls:
             u = urlparse(url)
@@ -95,6 +98,15 @@ class Config:
 
     def create_ssl_context(self: Self) -> ssl.SSLContext:
         """Create SSL context."""
+        if not self.kafka.client_cert:
+            raise ConfigRequiredError("KAFKA_CLIENT_CERT")
+
+        if not self.kafka.client_cert_key:
+            raise ConfigRequiredError("KAFKA_CLIENT_CERT_KEY")
+
+        if not self.kafka.trusted_cert:
+            raise ConfigRequiredError("KAFKA_TRUSTED_CERT")
+
         with NamedTemporaryFile(suffix=".crt") as cert_file, NamedTemporaryFile(
             suffix=".key",
         ) as key_file, NamedTemporaryFile(suffix=".crt") as trust_file:
